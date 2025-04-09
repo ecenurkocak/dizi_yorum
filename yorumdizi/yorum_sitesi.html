@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dizi & Film Yorumları</title>
+    <style>
+        body {
+            background-color: #FFB6C1; /* Soft Pink arka plan */
+            color: #4A4A4A; /* Koyu gri metin rengi */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+        .review {
+            background: #FFC0CB; /* Bebek pembesi yorum kartları */
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+            display: flex !important;
+            width: 280px;
+            height: auto !important;
+            min-height: 350px;
+            text-align: left;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            flex-direction: column;
+            padding-bottom: 40px; 
+
+        }
+
+        .review img {
+height: 180px; /* Görsel yüksekliğini azaltma */
+object-fit: cover;
+margin-bottom: 10px;
+}
+
+.review p {
+line-height: 1.4;
+font-size: 0.9em;
+flex-grow: 1; /* Metin alanını genişletme /
+overflow-y: auto; / Kaydırma çubuğu */
+padding-right: 5px;
+}
+        .review:hover {
+            transform: scale(1.05);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: #FFB6C1; /* Soft Pink buton */
+            color: #4A4A4A; /* Koyu gri metin rengi */
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #FFC0CB; /* Bebek pembesi buton hover */
+        }
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .delete-btn:hover {
+            background: darkred;
+        }
+        #reviews {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>yorumlarımss</h1>
+        <div id="reviews"></div>
+        <h2>yeni yorum ekleme</h2>
+        <input type="text" id="title" placeholder="Dizi/Film Adı">
+        <input type="text" id="poster" placeholder="Afiş URL">
+        <input type="text" id="user" placeholder="Adınız">
+        <textarea id="comment" placeholder="Yorumunuz"></textarea>
+        <button onclick="addReview()">Yorum Ekle</button>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde yorumları localStorage'dan yükle
+        window.onload = function() {
+            let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+            reviews.forEach(review => {
+                displayReview(review);
+            });
+        };
+
+        // Yorum ekleme fonksiyonu
+        function addReview() {
+            let title = document.getElementById("title").value;
+            let poster = document.getElementById("poster").value;
+            let user = document.getElementById("user").value;
+            let comment = document.getElementById("comment").value;
+
+            if (title && user && comment) {
+                let review = { title, poster, user, comment };
+                let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+                reviews.push(review);
+                localStorage.setItem("reviews", JSON.stringify(reviews));
+
+                displayReview(review);
+
+                document.getElementById("title").value = "";
+                document.getElementById("poster").value = "";
+                document.getElementById("user").value = "";
+                document.getElementById("comment").value = "";
+            } else {
+                alert("Lütfen tüm alanları doldurun!");
+            }
+        }
+
+        // Yorumları ekranda gösterme fonksiyonu
+        function displayReview(review) {
+            let reviewDiv = document.createElement("div");
+            reviewDiv.classList.add("review");
+            reviewDiv.innerHTML = `
+                <button class="delete-btn" onclick="deleteReview(this)">X</button>
+                <h3>${review.title}</h3>
+                <p><strong>${review.user}:</strong> ${review.comment}</p>
+            `;
+            if (review.poster) {
+                reviewDiv.innerHTML = `<img src="${review.poster}" width="100%" height="150px" style="border-radius: 10px;"><br>` + reviewDiv.innerHTML;
+            }
+            document.getElementById("reviews").prepend(reviewDiv);
+        }
+
+        // Yorum silme fonksiyonu
+        function deleteReview(button) {
+            let reviewDiv = button.parentElement;
+            let reviews = JSON.parse(localStorage.getItem("reviews"));
+            reviews = reviews.filter(review => {
+                return !reviewDiv.innerHTML.includes(review.title);
+            });
+            localStorage.setItem("reviews", JSON.stringify(reviews));
+            reviewDiv.remove();
+        }
+    </script>
+</body>
+</html>
